@@ -5,4 +5,4 @@ A jupyter notebook with examples of nmr data processing functions. Click the bin
 Notes
 
 1. it may take some time to start
-2. its very raw there's lots of python and text you need to ignore
+2. you may need to restart the kernel when it starts (press the > > button at the top ) 
