@@ -26,9 +26,14 @@ def _():
     PI = math.pi
     DATA_SIZE = 1024
 
+    # Plot dimensions
+    PLOT_WIDTH = 9
+    PLOT_HEIGHT_2_PANEL = 8
+    PLOT_HEIGHT_3_PANEL = 7
+
     # Figure sizes (width, height)
-    FIG_SIZE_2_PANEL = (9, 8)
-    FIG_SIZE_3_PANEL = (9, 7)
+    FIG_SIZE_2_PANEL = (PLOT_WIDTH, PLOT_HEIGHT_2_PANEL)
+    FIG_SIZE_3_PANEL = (PLOT_WIDTH, PLOT_HEIGHT_3_PANEL)
 
     return fftpack, math, np, plt, FIG_SIZE_2_PANEL, FIG_SIZE_3_PANEL
 
