@@ -28,7 +28,7 @@ def _():
 
     # Figure sizes (width, height)
     FIG_SIZE_2_PANEL = (9, 8)
-    FIG_SIZE_3_PANEL = (9, 10)
+    FIG_SIZE_3_PANEL = (9, 8)
 
     return fftpack, math, np, plt, FIG_SIZE_2_PANEL, FIG_SIZE_3_PANEL
 
