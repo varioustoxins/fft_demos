@@ -25,13 +25,18 @@ def _():
     DEFAULT_RED = '#d62728'
     PI = math.pi
     DATA_SIZE = 1024
-    return fftpack, math, np, plt
+
+    # Figure sizes (width, height)
+    FIG_SIZE_2_PANEL = (9, 8)
+    FIG_SIZE_3_PANEL = (9, 14)
+
+    return fftpack, math, np, plt, FIG_SIZE_2_PANEL, FIG_SIZE_3_PANEL
 
 
 @app.cell
-def _(math, np, plt):
+def _(FIG_SIZE_2_PANEL, FIG_SIZE_3_PANEL, math, np, plt):
     def plot_complex(xs, ys, title='', xl='', yl='', save_name="unknown.svg"):
-        fig = plt.figure()
+        fig = plt.figure(figsize=FIG_SIZE_2_PANEL)
 
         ax1 = fig.add_axes([0.1, 1.0, 0.8, 0.4])
         ax1.plot(xs, np.real(ys))
@@ -79,7 +84,7 @@ def _(math, np, plt):
         return xs, ys * step_arr
 
     def plot_real_data_detail_complex(xs, rys, ys, title='', detail=(0.0, 1.0)):
-        fig, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=(9, 14))
+        fig, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=FIG_SIZE_3_PANEL)
 
         rxs = range(len(rys))
         ax0.plot(rxs, rys)
@@ -100,7 +105,7 @@ def _(math, np, plt):
         if colors is None:
             colors = (('#d62728', '#1f77b4'), ('0.8', '#1f77b4'), ('0.8', '#1f77b4'))
 
-        fig, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=(9, 14))
+        fig, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=FIG_SIZE_3_PANEL)
 
         rxs = range(len(rys[0]))
         ax0.plot(rxs, rys[0], colors[0][0], alpha=0.5)
