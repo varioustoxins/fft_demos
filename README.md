@@ -4,13 +4,15 @@ Interactive demonstrations of FFT window functions and NMR signal processing.
 
 ## Interactive Notebooks
 
-### Jupyter Notebook (Run in Browser)
+### Marimo Notebook (WASM - Run in Browser)
+**[▶️ Open Interactive Notebook](https://varioustoxins.github.io/fft_demos/fft_window_new.wasm.html)**
+
+Modern reactive notebook running entirely in your browser via WebAssembly. No installation needed!
+
+### Jupyter Notebook (Binder)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/varioustoxins/fft_demos/HEAD?urlpath=apps%2Ffft_window.ipynb)
 
-Click to run the Jupyter notebook in your browser. Note: may take some time to start.
-
-### Marimo Notebook (Local - Recommended for Development)
-Modern reactive notebook with better interactivity and auto-reload. See installation below.
+Original Jupyter notebook version. Note: may take some time to start.
 
 ## Overview
 
