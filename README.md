@@ -9,6 +9,8 @@ Interactive demonstrations of FFT window functions and NMR signal processing.
 
 Modern reactive notebook running entirely in your browser via WebAssembly. No installation needed!
 
+> **Note:** Use Chrome, Firefox, or Edge. Safari has known compatibility issues with WASM notebooks.
+
 ### Jupyter Notebook (Binder)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/varioustoxins/fft_demos/HEAD?urlpath=apps%2Ffft_window.ipynb)
 
