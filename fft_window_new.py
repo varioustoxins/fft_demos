@@ -343,7 +343,9 @@ def _(exp_lb_slider, exp_percent_slider, fig_exp, mo):
 
 @app.cell
 def _(mo):
-    mo.md("## Gaussian Window (GM)")
+    mo.md("""
+    ## Gaussian Window (GM)
+    """)
     return
 
 
@@ -352,12 +354,22 @@ def _(mo):
     gm_lb_slider = mo.ui.slider(-40, 20, value=0, step=0.1, label="GM-LB")
     gm_gb_slider = mo.ui.slider(0.0001, 1.0, value=0.1, step=0.01, label="GM-GB")
     gm_percent_slider = mo.ui.slider(0.0, 1.0, value=0.5, step=0.01, label="Truncation %")
-    return gm_lb_slider, gm_gb_slider, gm_percent_slider
+    return gm_gb_slider, gm_lb_slider, gm_percent_slider
 
 
 @app.cell
-def _(gm_lb_slider, gm_gb_slider, gm_percent_slider, damped_sin_wave, step, gm_win,
-      zero_fill, fftpack, plot_real_data_detail_complex_overlay, np):
+def _(
+    damped_sin_wave,
+    fftpack,
+    gm_gb_slider,
+    gm_lb_slider,
+    gm_percent_slider,
+    gm_win,
+    np,
+    plot_real_data_detail_complex_overlay,
+    step,
+    zero_fill,
+):
     _frequency = 50
     _relaxation = 5
     _xs_gm, _ysc_gm = damped_sin_wave(_frequency, _relaxation)
@@ -383,14 +395,16 @@ def _(gm_lb_slider, gm_gb_slider, gm_percent_slider, damped_sin_wave, step, gm_w
 
 
 @app.cell
-def _(mo, gm_lb_slider, gm_gb_slider, gm_percent_slider, fig_gm):
+def _(fig_gm, gm_gb_slider, gm_lb_slider, gm_percent_slider, mo):
     mo.vstack([gm_lb_slider, gm_gb_slider, gm_percent_slider, fig_gm])
     return
 
 
 @app.cell
 def _(mo):
-    mo.md("## Sine Window")
+    mo.md("""
+    ## Sine Window
+    """)
     return
 
 
@@ -400,13 +414,28 @@ def _(mo):
     sin_end_slider = mo.ui.slider(0.01, 1.0, value=1.0, step=0.01, label="End")
     sin_power_slider = mo.ui.slider(1, 10, value=1, step=1, label="Power")
     sin_percent_slider = mo.ui.slider(0.0, 1.0, value=0.5, step=0.01, label="Truncation %")
-    return sin_start_slider, sin_end_slider, sin_power_slider, sin_percent_slider
+    return (
+        sin_end_slider,
+        sin_percent_slider,
+        sin_power_slider,
+        sin_start_slider,
+    )
 
 
 @app.cell
-def _(sin_start_slider, sin_end_slider, sin_power_slider, sin_percent_slider,
-      damped_sin_wave, step, sin_win, zero_fill, fftpack,
-      plot_real_data_detail_complex_overlay, np):
+def _(
+    damped_sin_wave,
+    fftpack,
+    np,
+    plot_real_data_detail_complex_overlay,
+    sin_end_slider,
+    sin_percent_slider,
+    sin_power_slider,
+    sin_start_slider,
+    sin_win,
+    step,
+    zero_fill,
+):
     _frequency = 50
     _relaxation = 5
     _xs_sin, _ysc_sin = damped_sin_wave(_frequency, _relaxation)
@@ -433,14 +462,23 @@ def _(sin_start_slider, sin_end_slider, sin_power_slider, sin_percent_slider,
 
 
 @app.cell
-def _(mo, sin_start_slider, sin_end_slider, sin_power_slider, sin_percent_slider, fig_sin_win):
+def _(
+    fig_sin_win,
+    mo,
+    sin_end_slider,
+    sin_percent_slider,
+    sin_power_slider,
+    sin_start_slider,
+):
     mo.vstack([sin_start_slider, sin_end_slider, sin_power_slider, sin_percent_slider, fig_sin_win])
     return
 
 
 @app.cell
 def _(mo):
-    mo.md("## Bad First Points")
+    mo.md("""
+    ## Bad First Points
+    """)
     return
 
 
@@ -448,12 +486,19 @@ def _(mo):
 def _(mo):
     bad_value_slider = mo.ui.slider(-10, 10, value=5.0, step=0.1, label="Bad Value")
     bad_length_slider = mo.ui.slider(0, 100, value=20, step=1, label="Length")
-    return bad_value_slider, bad_length_slider
+    return bad_length_slider, bad_value_slider
 
 
 @app.cell
-def _(bad_value_slider, bad_length_slider, damped_sin_wave, zero_fill, fftpack,
-      plot_real_data_detail_complex_overlay, np):
+def _(
+    bad_length_slider,
+    bad_value_slider,
+    damped_sin_wave,
+    fftpack,
+    np,
+    plot_real_data_detail_complex_overlay,
+    zero_fill,
+):
     _frequency = 50
     _relaxation = 5
     _xs_bad, _ysc_bad = damped_sin_wave(_frequency, _relaxation)
@@ -481,8 +526,190 @@ def _(bad_value_slider, bad_length_slider, damped_sin_wave, zero_fill, fftpack,
 
 
 @app.cell
-def _(mo, bad_value_slider, bad_length_slider, fig_bad):
+def _(bad_length_slider, bad_value_slider, fig_bad, mo):
     mo.vstack([bad_value_slider, bad_length_slider, fig_bad])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("## Clipping")
+    return
+
+
+@app.cell
+def _(mo):
+    clip_level_slider = mo.ui.slider(0.01, 1.0, value=1.0, step=0.01, label="Clip Level")
+    return (clip_level_slider,)
+
+
+@app.cell
+def _(clip_level_slider, damped_sin_wave, zero_fill, fftpack,
+      plot_real_data_detail_complex_overlay, np):
+    _frequency = 50
+    _relaxation = 5
+    _xs_clip, _ysc_clip = damped_sin_wave(_frequency, _relaxation)
+    _ysc0_clip = np.array(_ysc_clip, copy=True)
+
+    _rysc0_clip_pre = np.real(_ysc0_clip)
+
+    _ysc_clip = np.clip(_ysc_clip, -clip_level_slider.value, clip_level_slider.value)
+    _rysc_clip_pre = np.real(_ysc_clip)
+
+    _xs_clip, _ysc_clip = zero_fill(_xs_clip, _ysc_clip, len(_ysc_clip) * 4)
+    _yscft_clip = fftpack.fft(_ysc_clip)
+
+    _xs_clip, _ysc0_clip = zero_fill(_xs_clip, _ysc0_clip, len(_ysc0_clip) * 4)
+    _ysc0ft_clip = fftpack.fft(_ysc0_clip)
+
+    _colors_clip = (('0.8', '#1f77b4'), ('0.8', '#1f77b4'), ('0.8', '#1f77b4'))
+    fig_clip = plot_real_data_detail_complex_overlay(_xs_clip, [_rysc0_clip_pre, _rysc_clip_pre],
+                                                      [_ysc0ft_clip, _yscft_clip],
+                                                      'Clipping', detail=(0.04, 0.06),
+                                                      colors=_colors_clip)
+    return (fig_clip,)
+
+
+@app.cell
+def _(mo, clip_level_slider, fig_clip):
+    mo.vstack([clip_level_slider, fig_clip])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("## Offset Data")
+    return
+
+
+@app.cell
+def _(mo):
+    offset_slider = mo.ui.slider(0, 50, value=0, step=1, label="Offset")
+    return (offset_slider,)
+
+
+@app.cell
+def _(offset_slider, damped_sin_wave, zero_fill, fftpack,
+      plot_real_data_detail_complex_overlay, np):
+    _frequency = 50
+    _relaxation = 10
+    _xs_off, _ysc_off = damped_sin_wave(_frequency, _relaxation)
+    _ysc0_off = np.array(_ysc_off, copy=True)
+
+    _rysc0_off_pre = np.real(_ysc0_off)
+
+    _ysc_off = np.roll(_ysc_off, offset_slider.value)
+    _rysc_off_pre = np.real(_ysc_off)
+
+    _xs_off, _ysc_off = zero_fill(_xs_off, _ysc_off, len(_ysc_off) * 4)
+    _yscft_off = fftpack.fft(_ysc_off)
+
+    _xs_off, _ysc0_off = zero_fill(_xs_off, _ysc0_off, len(_ysc0_off) * 4)
+    _ysc0ft_off = fftpack.fft(_ysc0_off)
+
+    _colors_off = (('0.8', '#1f77b4'), ('0.8', '#1f77b4'), ('0.8', '#1f77b4'))
+    fig_offset = plot_real_data_detail_complex_overlay(_xs_off, [_rysc0_off_pre, _rysc_off_pre],
+                                                        [_ysc0ft_off, _yscft_off],
+                                                        'Offset Data', detail=(0.04, 0.06),
+                                                        colors=_colors_off)
+    return (fig_offset,)
+
+
+@app.cell
+def _(mo, offset_slider, fig_offset):
+    mo.vstack([offset_slider, fig_offset])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("## Zero Fills")
+    return
+
+
+@app.cell
+def _(mo):
+    zero_fills_slider = mo.ui.slider(0, 8, value=0, step=1, label="Zero Fill Level")
+    return (zero_fills_slider,)
+
+
+@app.cell
+def _(zero_fills_slider, damped_sin_wave, gm_win, zero_fill, fftpack,
+      plot_real_data_detail_complex_overlay, np):
+    _frequency = 50
+    _frequency_offset = 1.25
+    _frequency_2 = _frequency + _frequency_offset
+    _relaxation = 0.2
+
+    _xs_zf, _ysc_zf = damped_sin_wave(_frequency, _relaxation, data_size=1024*4)
+    _xs_zf, _ysc_zf2 = damped_sin_wave(_frequency_2, _relaxation, data_size=1024*4)
+    _ysc_zf = _ysc_zf + _ysc_zf2
+
+    _xs_zf, _ysc_zf = gm_win(_xs_zf, _ysc_zf, -0.20, 0.05)
+    _ysc0_zf = np.array(_ysc_zf, copy=True)
+
+    _rysc0_zf_pre = np.real(_ysc0_zf)
+    _rysc_zf_pre = np.real(_ysc_zf)
+
+    _zero_fill_length = (len(_ysc_zf) * (2**zero_fills_slider.value)) - len(_ysc_zf)
+
+    _xs_zf, _ysc_zf = zero_fill(_xs_zf, _ysc_zf, _zero_fill_length)
+    _yscft_zf = fftpack.fft(_ysc_zf)
+
+    _xs_zf, _ysc0_zf = zero_fill(_xs_zf, _ysc0_zf, _zero_fill_length)
+    _ysc0ft_zf = fftpack.fft(_ysc0_zf)
+
+    _colors_zf = (('0.8', '#1f77b4'), ('0.8', '#1f77b4'), ('0.8', '#1f77b4'))
+    fig_zerofill = plot_real_data_detail_complex_overlay(_xs_zf, [_rysc0_zf_pre, _rysc_zf_pre],
+                                                          [_ysc0ft_zf, _yscft_zf],
+                                                          'Zero Fills', detail=(0.01, 0.015),
+                                                          colors=_colors_zf)
+    return (fig_zerofill,)
+
+
+@app.cell
+def _(mo, zero_fills_slider, fig_zerofill):
+    mo.vstack([zero_fills_slider, fig_zerofill])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("## Noise")
+    return
+
+
+@app.cell
+def _(mo):
+    noise_percent_slider = mo.ui.slider(0.0, 1.0, value=0.5, step=0.01, label="Truncation %")
+    noise_level_slider = mo.ui.slider(0.0, 3.0, value=0.1, step=0.01, label="Noise Level")
+    return noise_percent_slider, noise_level_slider
+
+
+@app.cell
+def _(noise_percent_slider, noise_level_slider, damped_sin_wave, step, zero_fill,
+      fftpack, plot_real_data_detail_complex, np):
+    _frequency = 50
+    _relaxation = 5
+    _xs_noise, _ysc_noise = damped_sin_wave(_frequency, _relaxation)
+    _rysc_noise = np.real(_ysc_noise)
+
+    _noise = np.random.normal(size=(len(_rysc_noise),)) * noise_level_slider.value
+    _rysc_noise += _noise
+
+    _xs_noise, _ysc_noise = step(_xs_noise, _ysc_noise, noise_percent_slider.value)
+    _rysc_noise = np.real(_ysc_noise)
+    _xs_noise, _ysc_noise = zero_fill(_xs_noise, _ysc_noise, len(_ysc_noise) * 4)
+    _yscft_noise = fftpack.fft(_ysc_noise)
+
+    fig_noise = plot_real_data_detail_complex(_xs_noise, _rysc_noise, _yscft_noise,
+                                               'Noise', detail=(0.02, 0.08))
+    return (fig_noise,)
+
+
+@app.cell
+def _(mo, noise_percent_slider, noise_level_slider, fig_noise):
+    mo.vstack([noise_percent_slider, noise_level_slider, fig_noise])
     return
 
 
