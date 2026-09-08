@@ -28,7 +28,7 @@ def _():
 
     # Plot dimensions
     PLOT_WIDTH = 9
-    PLOT_HEIGHT_2_PANEL = 8
+    PLOT_HEIGHT_2_PANEL = 7
     PLOT_HEIGHT_3_PANEL = 7
 
     # Figure sizes (width, height)
