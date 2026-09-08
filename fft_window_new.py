@@ -28,7 +28,7 @@ def _():
 
     # Figure sizes (width, height)
     FIG_SIZE_2_PANEL = (9, 8)
-    FIG_SIZE_3_PANEL = (9, 8)
+    FIG_SIZE_3_PANEL = (9, 7)
 
     return fftpack, math, np, plt, FIG_SIZE_2_PANEL, FIG_SIZE_3_PANEL
 
@@ -212,7 +212,7 @@ def _(damped_sin_wave, freq_damped_slider, plot_complex, relax_slider):
 
 @app.cell
 def _(fig_damped, freq_damped_slider, mo, relax_slider):
-    mo.vstack([freq_damped_slider, relax_slider, fig_damped])
+    mo.vstack([mo.hstack([freq_damped_slider, relax_slider]), fig_damped])
     return
 
 
@@ -342,7 +342,7 @@ def _(
 
 @app.cell
 def _(exp_lb_slider, exp_percent_slider, fig_exp, mo):
-    mo.vstack([exp_lb_slider, exp_percent_slider, fig_exp])
+    mo.vstack([mo.hstack([exp_lb_slider, exp_percent_slider]), fig_exp])
     return
 
 
@@ -401,7 +401,7 @@ def _(
 
 @app.cell
 def _(fig_gm, gm_gb_slider, gm_lb_slider, gm_percent_slider, mo):
-    mo.vstack([gm_lb_slider, gm_gb_slider, gm_percent_slider, fig_gm])
+    mo.vstack([mo.hstack([gm_lb_slider, gm_gb_slider, gm_percent_slider]), fig_gm])
     return
 
 
@@ -475,7 +475,7 @@ def _(
     sin_power_slider,
     sin_start_slider,
 ):
-    mo.vstack([sin_start_slider, sin_end_slider, sin_power_slider, sin_percent_slider, fig_sin_win])
+    mo.vstack([mo.hstack([sin_start_slider, sin_end_slider, sin_power_slider, sin_percent_slider]), fig_sin_win])
     return
 
 
@@ -532,7 +532,7 @@ def _(
 
 @app.cell
 def _(bad_length_slider, bad_value_slider, fig_bad, mo):
-    mo.vstack([bad_value_slider, bad_length_slider, fig_bad])
+    mo.vstack([mo.hstack([bad_value_slider, bad_length_slider]), fig_bad])
     return
 
 
@@ -749,7 +749,7 @@ def _(
 
 @app.cell
 def _(fig_noise, mo, noise_level_slider, noise_percent_slider):
-    mo.vstack([noise_percent_slider, noise_level_slider, fig_noise])
+    mo.vstack([mo.hstack([noise_percent_slider, noise_level_slider]), fig_noise])
     return
 
 
