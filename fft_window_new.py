@@ -79,7 +79,7 @@ def _(math, np, plt):
         return xs, ys * step_arr
 
     def plot_real_data_detail_complex(xs, rys, ys, title='', detail=(0.0, 1.0)):
-        fig, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=(9, 8))
+        fig, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=(10, 12))
 
         rxs = range(len(rys))
         ax0.plot(rxs, rys)
@@ -100,7 +100,7 @@ def _(math, np, plt):
         if colors is None:
             colors = (('#d62728', '#1f77b4'), ('0.8', '#1f77b4'), ('0.8', '#1f77b4'))
 
-        fig, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=(9, 8))
+        fig, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=(10, 12))
 
         rxs = range(len(rys[0]))
         ax0.plot(rxs, rys[0], colors[0][0], alpha=0.5)
@@ -533,7 +533,9 @@ def _(bad_length_slider, bad_value_slider, fig_bad, mo):
 
 @app.cell
 def _(mo):
-    mo.md("## Clipping")
+    mo.md("""
+    ## Clipping
+    """)
     return
 
 
@@ -544,8 +546,14 @@ def _(mo):
 
 
 @app.cell
-def _(clip_level_slider, damped_sin_wave, zero_fill, fftpack,
-      plot_real_data_detail_complex_overlay, np):
+def _(
+    clip_level_slider,
+    damped_sin_wave,
+    fftpack,
+    np,
+    plot_real_data_detail_complex_overlay,
+    zero_fill,
+):
     _frequency = 50
     _relaxation = 5
     _xs_clip, _ysc_clip = damped_sin_wave(_frequency, _relaxation)
@@ -571,14 +579,16 @@ def _(clip_level_slider, damped_sin_wave, zero_fill, fftpack,
 
 
 @app.cell
-def _(mo, clip_level_slider, fig_clip):
+def _(clip_level_slider, fig_clip, mo):
     mo.vstack([clip_level_slider, fig_clip])
     return
 
 
 @app.cell
 def _(mo):
-    mo.md("## Offset Data")
+    mo.md("""
+    ## Offset Data
+    """)
     return
 
 
@@ -589,8 +599,14 @@ def _(mo):
 
 
 @app.cell
-def _(offset_slider, damped_sin_wave, zero_fill, fftpack,
-      plot_real_data_detail_complex_overlay, np):
+def _(
+    damped_sin_wave,
+    fftpack,
+    np,
+    offset_slider,
+    plot_real_data_detail_complex_overlay,
+    zero_fill,
+):
     _frequency = 50
     _relaxation = 10
     _xs_off, _ysc_off = damped_sin_wave(_frequency, _relaxation)
@@ -616,14 +632,16 @@ def _(offset_slider, damped_sin_wave, zero_fill, fftpack,
 
 
 @app.cell
-def _(mo, offset_slider, fig_offset):
+def _(fig_offset, mo, offset_slider):
     mo.vstack([offset_slider, fig_offset])
     return
 
 
 @app.cell
 def _(mo):
-    mo.md("## Zero Fills")
+    mo.md("""
+    ## Zero Fills
+    """)
     return
 
 
@@ -634,8 +652,15 @@ def _(mo):
 
 
 @app.cell
-def _(zero_fills_slider, damped_sin_wave, gm_win, zero_fill, fftpack,
-      plot_real_data_detail_complex_overlay, np):
+def _(
+    damped_sin_wave,
+    fftpack,
+    gm_win,
+    np,
+    plot_real_data_detail_complex_overlay,
+    zero_fill,
+    zero_fills_slider,
+):
     _frequency = 50
     _frequency_offset = 1.25
     _frequency_2 = _frequency + _frequency_offset
@@ -668,14 +693,16 @@ def _(zero_fills_slider, damped_sin_wave, gm_win, zero_fill, fftpack,
 
 
 @app.cell
-def _(mo, zero_fills_slider, fig_zerofill):
+def _(fig_zerofill, mo, zero_fills_slider):
     mo.vstack([zero_fills_slider, fig_zerofill])
     return
 
 
 @app.cell
 def _(mo):
-    mo.md("## Noise")
+    mo.md("""
+    ## Noise
+    """)
     return
 
 
@@ -683,12 +710,20 @@ def _(mo):
 def _(mo):
     noise_percent_slider = mo.ui.slider(0.0, 1.0, value=0.5, step=0.01, label="Truncation %")
     noise_level_slider = mo.ui.slider(0.0, 3.0, value=0.1, step=0.01, label="Noise Level")
-    return noise_percent_slider, noise_level_slider
+    return noise_level_slider, noise_percent_slider
 
 
 @app.cell
-def _(noise_percent_slider, noise_level_slider, damped_sin_wave, step, zero_fill,
-      fftpack, plot_real_data_detail_complex, np):
+def _(
+    damped_sin_wave,
+    fftpack,
+    noise_level_slider,
+    noise_percent_slider,
+    np,
+    plot_real_data_detail_complex,
+    step,
+    zero_fill,
+):
     _frequency = 50
     _relaxation = 5
     _xs_noise, _ysc_noise = damped_sin_wave(_frequency, _relaxation)
@@ -708,7 +743,7 @@ def _(noise_percent_slider, noise_level_slider, damped_sin_wave, step, zero_fill
 
 
 @app.cell
-def _(mo, noise_percent_slider, noise_level_slider, fig_noise):
+def _(fig_noise, mo, noise_level_slider, noise_percent_slider):
     mo.vstack([noise_percent_slider, noise_level_slider, fig_noise])
     return
 
