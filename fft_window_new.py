@@ -79,7 +79,7 @@ def _(math, np, plt):
         return xs, ys * step_arr
 
     def plot_real_data_detail_complex(xs, rys, ys, title='', detail=(0.0, 1.0)):
-        fig, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=(9, 14))
+        fig, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=(9, 12))
 
         rxs = range(len(rys))
         ax0.plot(rxs, rys)
@@ -100,7 +100,7 @@ def _(math, np, plt):
         if colors is None:
             colors = (('#d62728', '#1f77b4'), ('0.8', '#1f77b4'), ('0.8', '#1f77b4'))
 
-        fig, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=(9, 14))
+        fig, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=(9, 12))
 
         rxs = range(len(rys[0]))
         ax0.plot(rxs, rys[0], colors[0][0], alpha=0.5)
