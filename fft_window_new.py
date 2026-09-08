@@ -557,11 +557,12 @@ def _(mo):
 
 @app.cell
 def _(
+    FIG_SIZE_3_PANEL,
     clip_level_slider,
     damped_sin_wave,
     fftpack,
     np,
-    plot_real_data_detail_complex_overlay,
+    plt,
     zero_fill,
 ):
     _frequency = 50
@@ -580,11 +581,40 @@ def _(
     _xs_clip, _ysc0_clip = zero_fill(_xs_clip, _ysc0_clip, len(_ysc0_clip) * 4)
     _ysc0ft_clip = fftpack.fft(_ysc0_clip)
 
+    # Custom plot for clipping with vertical zoom in panel 3
     _colors_clip = (('0.8', '#1f77b4'), ('0.8', '#1f77b4'), ('0.8', '#1f77b4'))
-    fig_clip = plot_real_data_detail_complex_overlay(_xs_clip, [_rysc0_clip_pre, _rysc_clip_pre],
-                                                      [_ysc0ft_clip, _yscft_clip],
-                                                      'Clipping', detail=(0.04, 0.06),
-                                                      colors=_colors_clip)
+    fig_clip, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=FIG_SIZE_3_PANEL)
+
+    # Panel 1: Time domain
+    rxs = range(len(_rysc0_clip_pre))
+    ax0.plot(rxs, _rysc0_clip_pre, _colors_clip[0][0], alpha=0.5)
+    ax0.plot(rxs, _rysc_clip_pre, _colors_clip[0][1])
+    ax0.set_title("Clipping (Time Domain Real)")
+
+    # Panel 2: Full spectrum
+    ax1.plot(_xs_clip, np.real(_ysc0ft_clip), _colors_clip[1][0])
+    ax1.plot(_xs_clip, np.real(_yscft_clip), _colors_clip[1][1])
+    ax1.set_title("Full Spectrum")
+
+    # Panel 3: Full spectrum with y-axis scaled to show detail
+    ax2.plot(_xs_clip, np.real(_ysc0ft_clip), _colors_clip[2][0])
+    ax2.plot(_xs_clip, np.real(_yscft_clip), _colors_clip[2][1])
+    ax2.set_title("Full Spectrum (Vertical Zoom)")
+
+    # Find max value and second highest peak for vertical scaling
+    _spec_real = np.real(_yscft_clip)
+    _max_val = np.max(np.abs(_spec_real))
+    # Sort absolute values in descending order and get second highest
+    _sorted_peaks = np.sort(np.abs(_spec_real))[::-1]
+    # Skip first ~1% of points (main peak region) to find secondary peaks
+    _skip_points = max(int(len(_sorted_peaks) * 0.01), 100)
+    _second_max = _sorted_peaks[min(_skip_points, len(_sorted_peaks)-1)]
+    # Use 10% of max as fallback if secondary peaks are too small
+    _y_limit = max(_second_max * 1.1, _max_val * 0.1)
+    ax2.set_ylim(-_y_limit, _y_limit)
+
+    plt.tight_layout()
+
     return (fig_clip,)
 
 
