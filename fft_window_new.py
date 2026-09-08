@@ -25,11 +25,11 @@ def _():
     DEFAULT_RED = '#d62728'
     PI = math.pi
     DATA_SIZE = 1024
-    return np, plt
+    return math, np, plt
 
 
 @app.cell
-def _(np, plt):
+def _(math, np, plt):
     def plot_complex(xs, ys, title='', xl='', yl='', save_name="unknown.svg"):
         fig = plt.figure()
 
@@ -53,7 +53,16 @@ def _(np, plt):
         ysc = np.cos(ys) + 1j * np.sin(ys)
         return xs, ysc
 
-    return plot_complex, sin_wave
+    def exp_win(xs, ys, lb):
+        as_ = [np.exp(-lb*x) for x in xs]
+        return xs, ys * as_
+
+    def damped_sin_wave(frequency, relaxation, data_size=1024):
+        xs, ysc = sin_wave(frequency * 2.0 * math.pi, data_size=data_size)
+        xs, ysc = exp_win(xs, ysc, relaxation)
+        return xs, ysc
+
+    return plot_complex, sin_wave, exp_win, damped_sin_wave
 
 
 @app.cell
@@ -85,3 +94,28 @@ def _(fig_sine, frequency_slider, mo):
 
 if __name__ == "__main__":
     app.run()
+
+@app.cell
+def _(mo):
+    mo.md("## Damped Sine Wave")
+    return
+
+
+@app.cell
+def _(mo):
+    freq_damped_slider = mo.ui.slider(0.0, 512.0, value=100.0, label="Frequency")
+    relax_slider = mo.ui.slider(0.0, 20.0, value=1.0, label="Relaxation")
+    return freq_damped_slider, relax_slider
+
+
+@app.cell
+def _(freq_damped_slider, relax_slider, damped_sin_wave, plot_complex):
+    _xs_d, _ysc_d = damped_sin_wave(freq_damped_slider.value, relax_slider.value)
+    fig_damped = plot_complex(_xs_d, _ysc_d, 'damped cos wave', 'time', 'intensity')
+    return (fig_damped,)
+
+
+@app.cell
+def _(mo, freq_damped_slider, relax_slider, fig_damped):
+    mo.vstack([freq_damped_slider, relax_slider, fig_damped])
+    return
