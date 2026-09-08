@@ -25,7 +25,7 @@ def _():
     DEFAULT_RED = '#d62728'
     PI = math.pi
     DATA_SIZE = 1024
-    return math, np, plt
+    return fftpack, math, np, plt
 
 
 @app.cell
@@ -120,8 +120,40 @@ def _(math, np, plt):
         plt.tight_layout()
         return fig
 
-    return (damped_sin_wave, exp_win, plot_complex, plot_real_data_detail_complex,
-            plot_real_data_detail_complex_overlay, sin_wave, step, zero_fill)
+    def gm_win(xs, ys, lb, gb, sw=10000):
+        aq = 1 / sw * len(ys)
+        window = []
+        for i, y in enumerate(ys):
+            t = xs[i] * aq
+            fact_1 = -math.pi * t * lb
+            fact_2 = (-math.pi * lb * t**2) / (2 * gb * aq)
+            window.append(math.exp(fact_1 - fact_2))
+        return xs, ys * window
+
+    def sin_win(xs, ys, start=-1.0, end=1.0, power=1):
+        num_points = len(ys)
+        active_points = int(num_points * end)
+        func_points = active_points + active_points * -start
+        func_increment = math.pi / func_points
+        func_start = func_increment * (func_points - active_points)
+
+        window = np.zeros(num_points)
+        for i in range(active_points):
+            window[i] = math.sin(func_start + (i * func_increment))**power
+        return xs, ys * window
+
+    return (
+        damped_sin_wave,
+        exp_win,
+        gm_win,
+        plot_complex,
+        plot_real_data_detail_complex,
+        plot_real_data_detail_complex_overlay,
+        sin_wave,
+        sin_win,
+        step,
+        zero_fill,
+    )
 
 
 @app.cell
@@ -181,7 +213,9 @@ def _(fig_damped, freq_damped_slider, mo, relax_slider):
 
 @app.cell
 def _(mo):
-    mo.md("## FFT")
+    mo.md("""
+    ## FFT
+    """)
     return
 
 
@@ -192,7 +226,7 @@ def _(mo):
 
 
 @app.cell
-def _(fft_freq_slider, damped_sin_wave, zero_fill, fftpack, plot_complex, np):
+def _(damped_sin_wave, fft_freq_slider, fftpack, plot_complex, zero_fill):
     _relaxation = 10
     _xs_fft, _ysc_fft = damped_sin_wave(fft_freq_slider.value, _relaxation)
     _xs_fft, _ysc_fft = zero_fill(_xs_fft, _ysc_fft, len(_ysc_fft) * 4)
@@ -202,14 +236,16 @@ def _(fft_freq_slider, damped_sin_wave, zero_fill, fftpack, plot_complex, np):
 
 
 @app.cell
-def _(mo, fft_freq_slider, fig_fft):
+def _(fft_freq_slider, fig_fft, mo):
     mo.vstack([fft_freq_slider, fig_fft])
     return
 
 
 @app.cell
 def _(mo):
-    mo.md("## Truncation / Step Function")
+    mo.md("""
+    ## Truncation / Step Function
+    """)
     return
 
 
@@ -220,8 +256,15 @@ def _(mo):
 
 
 @app.cell
-def _(trunc_percent_slider, damped_sin_wave, step, zero_fill, fftpack,
-      plot_real_data_detail_complex, np):
+def _(
+    damped_sin_wave,
+    fftpack,
+    np,
+    plot_real_data_detail_complex,
+    step,
+    trunc_percent_slider,
+    zero_fill,
+):
     _frequency = 50
     _relaxation = 5
     _xs_tr, _ysc_tr = damped_sin_wave(_frequency, _relaxation)
@@ -236,14 +279,16 @@ def _(trunc_percent_slider, damped_sin_wave, step, zero_fill, fftpack,
 
 
 @app.cell
-def _(mo, trunc_percent_slider, fig_trunc):
+def _(fig_trunc, mo, trunc_percent_slider):
     mo.vstack([trunc_percent_slider, fig_trunc])
     return
 
 
 @app.cell
 def _(mo):
-    mo.md("## Exponential Window")
+    mo.md("""
+    ## Exponential Window
+    """)
     return
 
 
@@ -255,17 +300,28 @@ def _(mo):
 
 
 @app.cell
-def _(exp_lb_slider, exp_percent_slider, damped_sin_wave, step, exp_win,
-      zero_fill, fftpack, plot_real_data_detail_complex_overlay, np):
+def _(
+    damped_sin_wave,
+    exp_lb_slider,
+    exp_percent_slider,
+    exp_win,
+    fftpack,
+    np,
+    plot_real_data_detail_complex_overlay,
+    step,
+    zero_fill,
+):
     _frequency = 50
     _relaxation = 5
     _xs_exp, _ysc_exp = damped_sin_wave(_frequency, _relaxation)
     _ysc0_exp = np.array(_ysc_exp, copy=True)
 
     _xs_exp, _ysc0_exp = step(_xs_exp, _ysc0_exp, exp_percent_slider.value)
+    _rysc0_exp_pre = np.real(_ysc0_exp)
+
     _xs_exp, _ysc_exp = step(_xs_exp, _ysc_exp, exp_percent_slider.value)
     _xs_exp, _ysc_exp = exp_win(_xs_exp, _ysc_exp, exp_lb_slider.value)
-    _rysc_exp = np.real(_ysc_exp)
+    _rysc_exp_pre = np.real(_ysc_exp)
 
     _xs_exp, _ysc_exp = zero_fill(_xs_exp, _ysc_exp, len(_ysc_exp) * 4)
     _yscft_exp = fftpack.fft(_ysc_exp)
@@ -273,16 +329,160 @@ def _(exp_lb_slider, exp_percent_slider, damped_sin_wave, step, exp_win,
     _xs_exp, _ysc0_exp = zero_fill(_xs_exp, _ysc0_exp, len(_ysc0_exp) * 4)
     _ysc0ft_exp = fftpack.fft(_ysc0_exp)
 
-    _rysc0_exp = np.real(_ysc0_exp)
-    fig_exp = plot_real_data_detail_complex_overlay(_xs_exp, [_rysc0_exp, _rysc_exp],
+    fig_exp = plot_real_data_detail_complex_overlay(_xs_exp, [_rysc0_exp_pre, _rysc_exp_pre],
                                                      [_ysc0ft_exp, _yscft_exp],
                                                      'Exponential Window', detail=(0.04, 0.06))
     return (fig_exp,)
 
 
 @app.cell
-def _(mo, exp_lb_slider, exp_percent_slider, fig_exp):
+def _(exp_lb_slider, exp_percent_slider, fig_exp, mo):
     mo.vstack([exp_lb_slider, exp_percent_slider, fig_exp])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("## Gaussian Window (GM)")
+    return
+
+
+@app.cell
+def _(mo):
+    gm_lb_slider = mo.ui.slider(-40, 20, value=0, step=0.1, label="GM-LB")
+    gm_gb_slider = mo.ui.slider(0.0001, 1.0, value=0.1, step=0.01, label="GM-GB")
+    gm_percent_slider = mo.ui.slider(0.0, 1.0, value=0.5, step=0.01, label="Truncation %")
+    return gm_lb_slider, gm_gb_slider, gm_percent_slider
+
+
+@app.cell
+def _(gm_lb_slider, gm_gb_slider, gm_percent_slider, damped_sin_wave, step, gm_win,
+      zero_fill, fftpack, plot_real_data_detail_complex_overlay, np):
+    _frequency = 50
+    _relaxation = 5
+    _xs_gm, _ysc_gm = damped_sin_wave(_frequency, _relaxation)
+    _ysc0_gm = np.array(_ysc_gm, copy=True)
+
+    _xs_gm, _ysc0_gm = step(_xs_gm, _ysc0_gm, gm_percent_slider.value)
+    _rysc0_gm_pre = np.real(_ysc0_gm)
+
+    _xs_gm, _ysc_gm = step(_xs_gm, _ysc_gm, gm_percent_slider.value)
+    _xs_gm, _ysc_gm = gm_win(_xs_gm, _ysc_gm, gm_lb_slider.value, gm_gb_slider.value)
+    _rysc_gm_pre = np.real(_ysc_gm)
+
+    _xs_gm, _ysc_gm = zero_fill(_xs_gm, _ysc_gm, len(_ysc_gm) * 4)
+    _yscft_gm = fftpack.fft(_ysc_gm)
+
+    _xs_gm, _ysc0_gm = zero_fill(_xs_gm, _ysc0_gm, len(_ysc0_gm) * 4)
+    _ysc0ft_gm = fftpack.fft(_ysc0_gm)
+
+    fig_gm = plot_real_data_detail_complex_overlay(_xs_gm, [_rysc0_gm_pre, _rysc_gm_pre],
+                                                    [_ysc0ft_gm, _yscft_gm],
+                                                    'Gaussian Window', detail=(0.04, 0.06))
+    return (fig_gm,)
+
+
+@app.cell
+def _(mo, gm_lb_slider, gm_gb_slider, gm_percent_slider, fig_gm):
+    mo.vstack([gm_lb_slider, gm_gb_slider, gm_percent_slider, fig_gm])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("## Sine Window")
+    return
+
+
+@app.cell
+def _(mo):
+    sin_start_slider = mo.ui.slider(-1.0, 0.0, value=-1.0, step=0.01, label="Start")
+    sin_end_slider = mo.ui.slider(0.01, 1.0, value=1.0, step=0.01, label="End")
+    sin_power_slider = mo.ui.slider(1, 10, value=1, step=1, label="Power")
+    sin_percent_slider = mo.ui.slider(0.0, 1.0, value=0.5, step=0.01, label="Truncation %")
+    return sin_start_slider, sin_end_slider, sin_power_slider, sin_percent_slider
+
+
+@app.cell
+def _(sin_start_slider, sin_end_slider, sin_power_slider, sin_percent_slider,
+      damped_sin_wave, step, sin_win, zero_fill, fftpack,
+      plot_real_data_detail_complex_overlay, np):
+    _frequency = 50
+    _relaxation = 5
+    _xs_sin, _ysc_sin = damped_sin_wave(_frequency, _relaxation)
+    _ysc0_sin = np.array(_ysc_sin, copy=True)
+
+    _xs_sin, _ysc0_sin = step(_xs_sin, _ysc0_sin, sin_percent_slider.value)
+    _rysc0_sin_pre = np.real(_ysc0_sin)
+
+    _xs_sin, _ysc_sin = step(_xs_sin, _ysc_sin, sin_percent_slider.value)
+    _xs_sin, _ysc_sin = sin_win(_xs_sin, _ysc_sin, sin_start_slider.value,
+                                 sin_end_slider.value, sin_power_slider.value)
+    _rysc_sin_pre = np.real(_ysc_sin)
+
+    _xs_sin, _ysc_sin = zero_fill(_xs_sin, _ysc_sin, len(_ysc_sin) * 4)
+    _yscft_sin = fftpack.fft(_ysc_sin)
+
+    _xs_sin, _ysc0_sin = zero_fill(_xs_sin, _ysc0_sin, len(_ysc0_sin) * 4)
+    _ysc0ft_sin = fftpack.fft(_ysc0_sin)
+
+    fig_sin_win = plot_real_data_detail_complex_overlay(_xs_sin, [_rysc0_sin_pre, _rysc_sin_pre],
+                                                         [_ysc0ft_sin, _yscft_sin],
+                                                         'Sine Window', detail=(0.04, 0.06))
+    return (fig_sin_win,)
+
+
+@app.cell
+def _(mo, sin_start_slider, sin_end_slider, sin_power_slider, sin_percent_slider, fig_sin_win):
+    mo.vstack([sin_start_slider, sin_end_slider, sin_power_slider, sin_percent_slider, fig_sin_win])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("## Bad First Points")
+    return
+
+
+@app.cell
+def _(mo):
+    bad_value_slider = mo.ui.slider(-10, 10, value=5.0, step=0.1, label="Bad Value")
+    bad_length_slider = mo.ui.slider(0, 100, value=20, step=1, label="Length")
+    return bad_value_slider, bad_length_slider
+
+
+@app.cell
+def _(bad_value_slider, bad_length_slider, damped_sin_wave, zero_fill, fftpack,
+      plot_real_data_detail_complex_overlay, np):
+    _frequency = 50
+    _relaxation = 5
+    _xs_bad, _ysc_bad = damped_sin_wave(_frequency, _relaxation)
+    _ysc0_bad = np.array(_ysc_bad, copy=True)
+
+    _rysc0_bad_pre = np.real(_ysc0_bad)
+
+    # Apply bad values to the start
+    for i in range(bad_length_slider.value):
+        if i < len(_ysc_bad):
+            _ysc_bad[i] = bad_value_slider.value
+
+    _rysc_bad_pre = np.real(_ysc_bad)
+
+    _xs_bad, _ysc_bad = zero_fill(_xs_bad, _ysc_bad, len(_ysc_bad) * 4)
+    _yscft_bad = fftpack.fft(_ysc_bad)
+
+    _xs_bad, _ysc0_bad = zero_fill(_xs_bad, _ysc0_bad, len(_ysc0_bad) * 4)
+    _ysc0ft_bad = fftpack.fft(_ysc0_bad)
+
+    fig_bad = plot_real_data_detail_complex_overlay(_xs_bad, [_rysc0_bad_pre, _rysc_bad_pre],
+                                                     [_ysc0ft_bad, _yscft_bad],
+                                                     'Bad First Points', detail=(0.04, 0.06))
+    return (fig_bad,)
+
+
+@app.cell
+def _(mo, bad_value_slider, bad_length_slider, fig_bad):
+    mo.vstack([bad_value_slider, bad_length_slider, fig_bad])
     return
 
 
